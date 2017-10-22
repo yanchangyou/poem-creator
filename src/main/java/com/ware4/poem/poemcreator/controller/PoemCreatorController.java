@@ -104,6 +104,17 @@ public class PoemCreatorController {
     }
 
     /**
+     * 获取当前设置的消息
+     *
+     * @return
+     */
+    @RequestMapping("/getMessageOff")
+    @ResponseBody
+    public String getMessageOff() {
+        return message;
+    }
+
+    /**
      * 显示消息
      *
      * @param message
