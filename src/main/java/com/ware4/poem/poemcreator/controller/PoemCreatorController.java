@@ -155,7 +155,7 @@ public class PoemCreatorController {
         if (message == null || "".equals(message.trim())) {
             return "bad param!";
         }
-        String[] messages = message.split(",");
+        String[] messages = message.split(",|，");
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < messages.length; i++) {
             if (i != 0) {
