@@ -26,7 +26,7 @@ public class PoemCreatorController {
             "    [\n" + "<<MESSAGE>>" + "\n" + //
             "    ]]}";
 
-    String DEFAULT_MESSAGE = "\"诗人太忙请稍后\", \"喝杯凉茶歇歇手\",\"闭上眼睛养养眼\", \"联系客户聊感受\"";
+    String DEFAULT_MESSAGE = "\"诗人太忙请稍后\", \"闭上眼睛歇歇手\",\"右上有角公众号\", \"联系客户聊感受\"";
 
     String message = MESSAGE_TEMPLAGE.replaceAll("<<MESSAGE>>", DEFAULT_MESSAGE);
 
@@ -60,6 +60,23 @@ public class PoemCreatorController {
         }
 
         return result;
+    }
+
+    /**
+     * 打开消息
+     *
+     * @return
+     */
+    @RequestMapping("/index")
+    @ResponseBody
+    public String index() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("<a href='/poem/setMessageOn'>打开消息</a><br>");
+        builder.append("<a href='/poem/setMessageOff'>关闭消息</a><br>");
+        builder.append("<a href='/poem/showDefaultMessage'>显示默认消息</a><br>");
+        builder.append("<a href='/poem/showMessage'>显示消息（URL输入参数）</a><br>");
+
+        return builder.toString();
     }
 
     /**
