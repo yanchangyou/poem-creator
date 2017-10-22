@@ -33,6 +33,25 @@ public class PoemCreatorController {
     volatile boolean showMessageFlag;
 
     /**
+     * 打开消息
+     *
+     * @return
+     */
+    @RequestMapping("/index")
+    @ResponseBody
+    public String index() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("<a href='/poem/setMessageOn'>打开消息</a><br>");
+        builder.append("<a href='/poem/setMessageOff'>关闭消息</a><br>");
+        builder.append("<a href='/poem/showDefaultMessage'>显示默认消息</a><br>");
+        builder.append("<a href='/poem/getMessage'>获取当前设置的消息</a><br>");
+        builder.append("<a href='/poem/showMessage?message=&second='>显示消息（URL输入参数）</a><br>");
+
+        return builder.toString();
+    }
+
+
+    /**
      *
      * @param seed 作诗关键词
      * @param type 类型： 五言、七言
@@ -67,23 +86,6 @@ public class PoemCreatorController {
      *
      * @return
      */
-    @RequestMapping("/index")
-    @ResponseBody
-    public String index() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("<a href='/poem/setMessageOn'>打开消息</a><br>");
-        builder.append("<a href='/poem/setMessageOff'>关闭消息</a><br>");
-        builder.append("<a href='/poem/showDefaultMessage'>显示默认消息</a><br>");
-        builder.append("<a href='/poem/showMessage?message=&second='>显示消息（URL输入参数）</a><br>");
-
-        return builder.toString();
-    }
-
-    /**
-     * 打开消息
-     *
-     * @return
-     */
     @RequestMapping("/setMessageOn")
     @ResponseBody
     public String setMessageOn() {
@@ -108,9 +110,9 @@ public class PoemCreatorController {
      *
      * @return
      */
-    @RequestMapping("/getMessageOff")
+    @RequestMapping("/getMessage")
     @ResponseBody
-    public String getMessageOff() {
+    public String getMessage() {
         return message;
     }
 
