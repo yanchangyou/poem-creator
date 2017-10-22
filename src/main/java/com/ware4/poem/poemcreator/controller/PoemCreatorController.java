@@ -40,7 +40,7 @@ public class PoemCreatorController {
      *
      * @return
      */
-    @RequestMapping("/index")
+    @RequestMapping("/index798")
     @ResponseBody
     public String index() {
         StringBuilder builder = new StringBuilder();
