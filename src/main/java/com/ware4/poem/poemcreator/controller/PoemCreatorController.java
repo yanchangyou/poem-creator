@@ -155,7 +155,16 @@ public class PoemCreatorController {
         if (message == null || "".equals(message.trim())) {
             return "bad param!";
         }
-        this.message = MESSAGE_TEMPLAGE.replaceAll("<<MESSAGE>>", message);
+        String[] messages = message.split(",");
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < messages.length; i++) {
+            if (i != 0) {
+                builder.append(",");
+            }
+            builder.append("\"").append(messages[i]).append("\"");
+        }
+
+        this.message = MESSAGE_TEMPLAGE.replaceAll("<<MESSAGE>>", builder.toString());
         showMessageFlag = true;
 
         sleep(second);
