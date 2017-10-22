@@ -74,7 +74,7 @@ public class PoemCreatorController {
         builder.append("<a href='/poem/setMessageOn'>打开消息</a><br>");
         builder.append("<a href='/poem/setMessageOff'>关闭消息</a><br>");
         builder.append("<a href='/poem/showDefaultMessage'>显示默认消息</a><br>");
-        builder.append("<a href='/poem/showMessage'>显示消息（URL输入参数）</a><br>");
+        builder.append("<a href='/poem/showMessage?message=&second='>显示消息（URL输入参数）</a><br>");
 
         return builder.toString();
     }
@@ -113,7 +113,7 @@ public class PoemCreatorController {
     @ResponseBody
     public String showMessage(String message, Integer second) {
 
-        if (message == null) {
+        if (message == null || "".equals(message.trim())) {
             return "bad param!";
         }
         this.message = MESSAGE_TEMPLAGE.replaceAll("<<MESSAGE>>", message);
@@ -148,7 +148,7 @@ public class PoemCreatorController {
                 super.run();
 
                 try {
-                    int theSecond = (second == null) ? 60 : second;
+                    int theSecond = (second == null || 0 == second) ? 60 : second;
                     Thread.sleep(theSecond * 1000L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
