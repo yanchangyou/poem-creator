@@ -32,6 +32,9 @@ public class PoemCreatorController {
 
     volatile boolean showMessageFlag;
 
+    long preTime = System.currentTimeMillis();
+    long timeDelay = 500L;// 毫秒
+
     /**
      * 打开消息
      *
@@ -41,6 +44,7 @@ public class PoemCreatorController {
     @ResponseBody
     public String index() {
         StringBuilder builder = new StringBuilder();
+        builder.append("<a href='/poem/setTimeDelay?timeDelay=500'>设置时间延迟</a><br>");
         builder.append("<a href='/poem/setMessageOn'>打开消息</a><br>");
         builder.append("<a href='/poem/setMessageOff'>关闭消息</a><br>");
         builder.append("<a href='/poem/showDefaultMessage'>显示默认消息</a><br>");
@@ -49,7 +53,6 @@ public class PoemCreatorController {
 
         return builder.toString();
     }
-
 
     /**
      *
@@ -68,7 +71,7 @@ public class PoemCreatorController {
         urlBuilder.append("&type=").append(type);
         urlBuilder.append("&uuid=").append(uuid);
         String result = "";
-        if (showMessageFlag || "true".equals(flag)) {
+        if (showMessageFlag || "true".equals(flag) || isTpsControll()) {
             result = this.message;
         } else {
             try {
@@ -79,6 +82,29 @@ public class PoemCreatorController {
         }
 
         return result;
+    }
+
+    /**
+     * 两次时间间隔小于500，触发流控
+     * 
+     * @return
+     */
+    public boolean isTpsControll() {
+        boolean result = System.currentTimeMillis() - preTime < timeDelay;
+        preTime = System.currentTimeMillis();
+        return result;
+    }
+
+    /**
+     * 设置时间延迟
+     *
+     * @return
+     */
+    @RequestMapping("/setTimeDelay")
+    @ResponseBody
+    public String setTimeDelay(long timeDelay) {
+        this.timeDelay = timeDelay;
+        return "setTimeDelay OK!";
     }
 
     /**
