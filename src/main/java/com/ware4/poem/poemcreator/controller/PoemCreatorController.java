@@ -52,6 +52,8 @@ public class PoemCreatorController {
         builder.append("<a href='/poem/showDefaultMessage'>显示默认消息</a><br>");
         builder.append("<a href='/poem/getMessage'>获取当前设置的消息</a><br>");
         builder.append("<a href='/poem/showMessage?message=&second='>显示消息（URL输入参数）</a><br>");
+        builder.append("<a href='/poem/setAdContent?adContent='>设置广告词</a><br>");
+        builder.append("<a href='/poem/getAdContent'>查看广告词</a><br>");
 
         return builder.toString();
     }
@@ -200,6 +202,10 @@ public class PoemCreatorController {
     @ResponseBody
     public String setAdContent(String adContent) {
 
+        if (adContent == null || adContent.trim().equals("")) {
+            return "no param!";
+        }
+
         this.adContent = adContent;
 
         return "OK!" + adContent;
@@ -216,9 +222,6 @@ public class PoemCreatorController {
 
         return adContent;
     }
-
-
-
 
     private void sleep(Integer second) {
         new Thread() {
