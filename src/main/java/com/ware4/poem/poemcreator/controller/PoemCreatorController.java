@@ -35,6 +35,8 @@ public class PoemCreatorController {
     long preTime = System.currentTimeMillis();
     long timeDelay = 500L;// 毫秒
 
+    String adContent = "更多的免费软件，请右上角关注公众号“进好店商户服务”";
+
     /**
      * 打开消息
      *
@@ -188,6 +190,35 @@ public class PoemCreatorController {
 
         return "OK!";
     }
+
+    /**
+     * 设置广告
+     *
+     * @return
+     */
+    @RequestMapping("/setAdContent")
+    @ResponseBody
+    public String setAdContent(String adContent) {
+
+        this.adContent = adContent;
+
+        return "OK!" + adContent;
+    }
+
+    /**
+     * 获取广告
+     *
+     * @return
+     */
+    @RequestMapping("/getAdContent")
+    @ResponseBody
+    public String getAdContent() {
+
+        return adContent;
+    }
+
+
+
 
     private void sleep(Integer second) {
         new Thread() {
