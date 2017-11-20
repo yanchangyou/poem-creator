@@ -81,6 +81,7 @@ public class PoemCreatorController {
             try {
                 result = HttpClientWrapper.httpGet(urlBuilder.toString());
             } catch (IOException e) {
+                e.printStackTrace();
                 result = this.message;
             }
         }
