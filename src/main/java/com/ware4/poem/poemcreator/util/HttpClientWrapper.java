@@ -19,6 +19,7 @@ public class HttpClientWrapper {
 
     static OkHttpClient httpClient = new OkHttpClient();
 
+
     static {
         try {
             setSSL(httpClient);
