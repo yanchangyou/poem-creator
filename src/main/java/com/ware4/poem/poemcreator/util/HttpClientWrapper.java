@@ -29,26 +29,26 @@ public class HttpClientWrapper {
     }
 
     private static void setSSL(OkHttpClient httpClient) throws Exception {
-        SSLContext sc = SSLContext.getInstance("SSL");
-        TrustManager[] trustManager = new TrustManager[] { new X509TrustManager() {
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-
-            @Override
-            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-
-            }
-
-            @Override
-            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-
-            }
-        } };
-        sc.init(null, trustManager, new SecureRandom());
+//        SSLContext sc = SSLContext.getInstance("SSL");
+//        TrustManager[] trustManager = new TrustManager[] { new X509TrustManager() {
+//            @Override
+//            public X509Certificate[] getAcceptedIssuers() {
+//                return null;
+//            }
+//
+//            @Override
+//            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+//
+//            }
+//
+//            @Override
+//            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+//
+//            }
+//        } };
+//        sc.init(null, trustManager, new SecureRandom());
         OkHttpClient.Builder builder = httpClient.newBuilder();
-        builder.sslSocketFactory(sc.getSocketFactory(), (X509TrustManager) trustManager[0]);
+//        builder.sslSocketFactory(sc.getSocketFactory(), (X509TrustManager) trustManager[0]);
         builder.hostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
