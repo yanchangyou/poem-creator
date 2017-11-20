@@ -19,42 +19,42 @@ public class HttpClientWrapper {
 
     static OkHttpClient httpClient = new OkHttpClient();
 
-
     static {
         try {
-            setSSL(httpClient);
+            setSSL();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void setSSL(OkHttpClient httpClient) throws Exception {
-//        SSLContext sc = SSLContext.getInstance("SSL");
-//        TrustManager[] trustManager = new TrustManager[] { new X509TrustManager() {
-//            @Override
-//            public X509Certificate[] getAcceptedIssuers() {
-//                return null;
-//            }
-//
-//            @Override
-//            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-//
-//            }
-//
-//            @Override
-//            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-//
-//            }
-//        } };
-//        sc.init(null, trustManager, new SecureRandom());
-        OkHttpClient.Builder builder = httpClient.newBuilder();
-//        builder.sslSocketFactory(sc.getSocketFactory(), (X509TrustManager) trustManager[0]);
-        builder.hostnameVerifier(new HostnameVerifier() {
+    private static void setSSL() throws Exception {
+        SSLContext sc = SSLContext.getInstance("SSL");
+        TrustManager[] trustManager = new TrustManager[] { new X509TrustManager() {
             @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
             }
-        });
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+            }
+        } };
+        sc.init(null, trustManager, new SecureRandom());
+        httpClient = new OkHttpClient().newBuilder()
+                .sslSocketFactory(sc.getSocketFactory(), (X509TrustManager) trustManager[0])
+                .hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                }).build();
+
     }
 
     public static String httpGet(String url) throws IOException {
