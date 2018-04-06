@@ -7,6 +7,8 @@ package com.ware4.poem.poemcreator.controller;
  */
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
@@ -34,6 +36,14 @@ public class PoemCreatorController {
 
     long preTime = System.currentTimeMillis();
     long timeDelay = 500L;// 毫秒
+    int poemFrom = 1; // 1:IBM,2: 易源数据（https://www.showapi.com/api/lookPoint/950）
+
+    Map<Integer, String> poemFromMap = new HashMap();
+
+    {
+        poemFromMap.put(1, "IBM偶得");
+        poemFromMap.put(2, "易源数据");
+    }
 
     String adContent = "更多的免费软件，请右上角关注公众号“进好店商户服务”";
 
@@ -54,6 +64,8 @@ public class PoemCreatorController {
         builder.append("<a href='/poem/showMessage?message=&second='>显示消息（URL输入参数）</a><br>");
         builder.append("<a href='/poem/setAdContent?adContent='>设置广告词</a><br>");
         builder.append("<a href='/poem/getAdContent'>查看广告词</a><br>");
+        builder.append("<a href='/poem/setPoemFrom?poemFrom=1'>从IBM偶得获取诗</a><br>");
+        builder.append("<a href='/poem/setPoemFrom?poemFrom=2'>从易源获取诗</a><br>");
 
         return builder.toString();
     }
@@ -68,26 +80,96 @@ public class PoemCreatorController {
     @RequestMapping("/getpoems")
     @ResponseBody
     public String getpoems(String seed, String type, String uuid, String flag) {
+        String result = "";
 
+        if (showMessageFlag || "true".equals(flag) || isTpsControll()) {
+            result = this.message;
+        } else {
+            switch (poemFrom) {
+                case 2:
+                    int yiyuanNum = "3".equals(type) ? 5 : 7;
+                    result = converToIBMPoem(getPoemFromYiyuan(yiyuanNum, seed));
+                    break;
+                default:
+                    result = getPoemFromIBM(seed, type, uuid, flag);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 调用IBM偶得系统获取诗
+     * 
+     * @param seed
+     * @param type
+     * @param uuid
+     * @param flag
+     * @return
+     */
+    private String getPoemFromIBM(String seed, String type, String uuid, String flag) {
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append("https://crl.ptopenlab.com:8800/poem/getpoems?");
         urlBuilder.append("&seed=").append(seed);
         urlBuilder.append("&type=").append(type);
         urlBuilder.append("&uuid=").append(uuid);
         String result = "";
-        if (showMessageFlag || "true".equals(flag) || isTpsControll()) {
+        try {
+            result = HttpClientWrapper.httpGet(urlBuilder.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
             result = this.message;
-        } else {
-            try {
-                result = HttpClientWrapper.httpGet(urlBuilder.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-                result = this.message;
-            }
         }
-
-
         return result;
+    }
+
+    /**
+     * 调用易源接口获取诗
+     * 
+     * @param num
+     * @param key
+     * @return
+     */
+    @RequestMapping("/getPoemFromYiyuan")
+    @ResponseBody
+    public String getPoemFromYiyuan(int num, String key) {
+        StringBuilder urlBuilder = new StringBuilder();
+
+        urlBuilder
+                .append("http://route.showapi.com/950-1?showapi_appid=58017&type=1&yayuntype=3&showapi_sign=4a00826925ea47c1878d2b3bb96b4e78");
+        urlBuilder.append("&num=").append(num);
+        urlBuilder.append("&key=").append(key);
+        String result = "";
+        try {
+            result = HttpClientWrapper.httpGet(urlBuilder.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            result = this.message;
+        }
+        return result;
+    }
+
+    /**
+     * 转换为IBM诗的格式：格式应该独立
+     * 
+     * @param poem
+     * @return
+     */
+    String converToIBMPoem(String poem) {
+        String result = poem;
+
+        // 提取诗
+        String poemList = poem.substring(poem.indexOf("\"list\":[\"") + 8, poem.length() - 3);
+        // 变数字
+        String poemArray = poemList;
+        poemArray = poemArray.replaceAll("。\",\"", "\"\\],\\[\"");
+        poemArray = poemArray.replaceAll("，", "\",\"");
+        poemArray = poemArray.replaceAll("。", "\",\"");
+        return "{\n" + //
+                "  \"poemIdx\": 0, \n" + //
+                "  \"poems\": [[\n" + //
+                "    " + poemArray + "\n" + //
+                "    ]]}";
     }
 
     /**
@@ -223,6 +305,18 @@ public class PoemCreatorController {
     public String getAdContent() {
 
         return adContent;
+    }
+
+    @RequestMapping("/getPoemFrom")
+    @ResponseBody
+    public int getPoemFrom() {
+        return poemFrom;
+    }
+
+    @RequestMapping("/setPoemFrom")
+    @ResponseBody
+    public void setPoemFrom(int poemFrom) {
+        this.poemFrom = poemFrom;
     }
 
     private void sleep(Integer second) {
