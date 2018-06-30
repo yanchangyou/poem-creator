@@ -84,50 +84,52 @@ public class PoemCreatorController {
         if (showMessageFlag || "true".equals(flag) || isTpsControll()) {
             result = this.message;
         } else {
-//            String[] poems = new String[3];
 
-            result = converToMyPoem(getPoemFromMy(seed));
-//            switch (poemFrom) {
-//                case 3:
-//                    result = converToMyPoem(getPoemFromMy(seed));
-//                    break;
-//                case 2:
-//                    int yiyuanNum = "3".equals(type) ? 5 : 7;
-//                    result = converToIBMPoem(getPoemFromYiyuan(yiyuanNum, seed));
-//                    break;
-//                default:
-//                    result = getPoemFromIBM(seed, type, uuid, flag);
-//            }
+            result = converToMyPoem(seed);
+            // switch (poemFrom) {
+            // case 3:
+            // result = converToMyPoem(getPoemFromMy(seed));
+            // break;
+            // case 2:
+            // int yiyuanNum = "3".equals(type) ? 5 : 7;
+            // result = converToIBMPoem(getPoemFromYiyuan(yiyuanNum, seed));
+            // break;
+            // default:
+            // result = getPoemFromIBM(seed, type, uuid, flag);
+            // }
         }
 
         return result;
     }
 
-
     /**
      * 转换为my诗的格式：格式应该独立
      *
-     * @param poem
+     * @param key
      * @return
      */
-    String converToMyPoem(String poem) {
-        String result = poem;
+    String converToMyPoem(String key) {
 
-        // 提取诗
-        String[] poemList = poem.split("，|。");
-        // 变数字
-        String poemArray = "";
-        for (String one : poemList) {
-            poemArray += "\"" + one +"\",";
+        StringBuilder poemBuf = new StringBuilder();
+
+        for (int i = 0; i < 5; i++) {
+            String poem = getPoemFromMy(key);
+
+            String[] poemList = poem.split("，|。");
+            String poemArray = "";
+            for (String one : poemList) {
+                poemArray += "\"" + one + "\",";
+            }
+            poemArray = poemArray.substring(0, poemArray.length() - 1);
+            poemBuf.append("[").append(poemArray).append("],");
         }
-        poemArray = poemArray.substring(0,poemArray.length()-1);
+
         return "{\n" + //
                 "  \"poemIdx\": 0, \n" + //
-                "  \"poems\": [[\n" + //
-                "    " + poemArray + "\n" + //
-                "    ]]}";
+                "  \"poems\": [\n" + //
+                "    " + poemBuf.substring(0, poemBuf.length() - 1) + "\n" + //
+                "    ]}";
     }
-
 
     /**
      * 调用IBM偶得系统获取诗
