@@ -71,7 +71,6 @@ public class PoemCreatorController {
     }
 
     /**
-     *
      * @param seed 作诗关键词
      * @param type 类型： 五言、七言
      * @param uuid uuid，避免重复
@@ -85,22 +84,54 @@ public class PoemCreatorController {
         if (showMessageFlag || "true".equals(flag) || isTpsControll()) {
             result = this.message;
         } else {
-            switch (poemFrom) {
-                case 2:
-                    int yiyuanNum = "3".equals(type) ? 5 : 7;
-                    result = converToIBMPoem(getPoemFromYiyuan(yiyuanNum, seed));
-                    break;
-                default:
-                    result = getPoemFromIBM(seed, type, uuid, flag);
-            }
+//            String[] poems = new String[3];
+
+            result = converToMyPoem(getPoemFromMy(seed));
+//            switch (poemFrom) {
+//                case 3:
+//                    result = converToMyPoem(getPoemFromMy(seed));
+//                    break;
+//                case 2:
+//                    int yiyuanNum = "3".equals(type) ? 5 : 7;
+//                    result = converToIBMPoem(getPoemFromYiyuan(yiyuanNum, seed));
+//                    break;
+//                default:
+//                    result = getPoemFromIBM(seed, type, uuid, flag);
+//            }
         }
 
         return result;
     }
 
+
+    /**
+     * 转换为my诗的格式：格式应该独立
+     *
+     * @param poem
+     * @return
+     */
+    String converToMyPoem(String poem) {
+        String result = poem;
+
+        // 提取诗
+        String[] poemList = poem.split("，|。");
+        // 变数字
+        String poemArray = "";
+        for (String one : poemList) {
+            poemArray += "\"" + one +"\",";
+        }
+        poemArray = poemArray.substring(0,poemArray.length()-1);
+        return "{\n" + //
+                "  \"poemIdx\": 0, \n" + //
+                "  \"poems\": [[\n" + //
+                "    " + poemArray + "\n" + //
+                "    ]]}";
+    }
+
+
     /**
      * 调用IBM偶得系统获取诗
-     * 
+     *
      * @param seed
      * @param type
      * @param uuid
@@ -125,7 +156,7 @@ public class PoemCreatorController {
 
     /**
      * 调用易源接口获取诗
-     * 
+     *
      * @param num
      * @param key
      * @return
@@ -150,8 +181,31 @@ public class PoemCreatorController {
     }
 
     /**
+     * 调用腾讯云接口获取诗
+     *
+     * @param key
+     * @return
+     */
+    @RequestMapping("/getPoemFromMy")
+    @ResponseBody
+    public String getPoemFromMy(String key) {
+        StringBuilder urlBuilder = new StringBuilder();
+
+        urlBuilder.append("http://118.24.108.154:5000/poem?style=3");
+        urlBuilder.append("&start=").append(key);
+        String result = "";
+        try {
+            result = HttpClientWrapper.httpGet(urlBuilder.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            result = this.message;
+        }
+        return result;
+    }
+
+    /**
      * 转换为IBM诗的格式：格式应该独立
-     * 
+     *
      * @param poem
      * @return
      */
@@ -174,7 +228,7 @@ public class PoemCreatorController {
 
     /**
      * 两次时间间隔小于500，触发流控
-     * 
+     *
      * @return
      */
     public boolean isTpsControll() {
