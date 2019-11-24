@@ -193,7 +193,8 @@ public class PoemCreatorController {
     public String getPoemFromMy(String key) {
         StringBuilder urlBuilder = new StringBuilder();
 
-        urlBuilder.append("http://118.24.108.154:5000/poem?style=3");
+        //urlBuilder.append("http://118.24.108.154:5000/poem?style=3");
+        urlBuilder.append("http://127.0.0.1:5000/poem?style=3");
         urlBuilder.append("&start=").append(key);
         String result = "";
         try {
