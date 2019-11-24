@@ -7,9 +7,18 @@ package com.ware4.poem.poemcreator.controller;
  */
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import jdk.nashorn.internal.parser.JSONParser;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +52,8 @@ public class PoemCreatorController {
     {
         poemFromMap.put(1, "IBM偶得");
         poemFromMap.put(2, "易源数据");
+        poemFromMap.put(3, "本地");
+        poemFromMap.put(4, "百度");
     }
 
     String adContent = "更多的免费软件，请右上角关注公众号“进好店商户服务”";
@@ -84,8 +95,8 @@ public class PoemCreatorController {
         if (showMessageFlag || "true".equals(flag) || isTpsControll()) {
             result = this.message;
         } else {
-
-            result = converToMyPoem(seed);
+            result = getPoemFromBaidu(seed);
+//            result = converToMyPoem(seed);
             // switch (poemFrom) {
             // case 3:
             // result = converToMyPoem(getPoemFromMy(seed));
@@ -155,6 +166,35 @@ public class PoemCreatorController {
         }
         return result;
     }
+
+    /**
+     * 调用IBM偶得系统获取诗
+     *
+     * @param keywords
+     * @return
+     */
+    private String getPoemFromBaidu(String keywords) {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("https://aip.baidubce.com/rpc/2.0/creation/v1/poem?");
+        urlBuilder.append("&access_token=").append("24.958c5a4f2a95907b672ba837cb025625.2592000.1577077412.282335-17799252");
+//        BaiduPoem baiduPoem = null;
+        String poemString = null;
+        try {
+            String json = "{\"text\":\"" + keywords + "\",\"index\":" + new Random().nextInt(100) + "}";
+            String result = HttpClientWrapper.httpPostJson(urlBuilder.toString(), json);
+            JSONObject object = JSON.parseObject(result);
+            System.out.println(object);
+            poemString = (String) ((JSONObject) ((JSONArray) object.get("poem")).get(0)).get("content");
+        } catch (IOException e) {
+            e.printStackTrace();
+            poemString = this.message;
+            return this.message;
+        }
+        Map map = new HashMap();
+        map.put("poemIdx", 0);
+        map.put("poems", new String[][]{poemString.split("\t")});
+        return JSON.toJSONString(map);
+   }
 
     /**
      * 调用易源接口获取诗
@@ -393,5 +433,26 @@ public class PoemCreatorController {
 
         }.start();
 
+    }
+}
+
+class BaiduPoem {
+    String content;
+    String title;
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
