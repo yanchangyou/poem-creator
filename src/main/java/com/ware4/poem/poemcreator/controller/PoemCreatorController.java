@@ -95,8 +95,8 @@ public class PoemCreatorController {
         if (showMessageFlag || "true".equals(flag) || isTpsControll()) {
             result = this.message;
         } else {
-            result = getPoemFromBaidu(seed);
-//            result = converToMyPoem(seed);
+//            result = getPoemFromBaidu(seed);
+            result = converToMyPoem(seed);
             // switch (poemFrom) {
             // case 3:
             // result = converToMyPoem(getPoemFromMy(seed));
@@ -123,7 +123,7 @@ public class PoemCreatorController {
 
         StringBuilder poemBuf = new StringBuilder();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             String poem = getPoemFromMy(key);
 
             String[] poemList = poem.split("，|。");
